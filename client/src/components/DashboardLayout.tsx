@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { Search, History, PlusCircle, LogOut, PanelLeft, Shield } from "lucide-react";
+import { Search, History, PlusCircle, LogOut, PanelLeft, Shield, GitCompare } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -31,6 +31,7 @@ const menuItems = [
   { icon: Search, label: "Dashboard", path: "/" },
   { icon: PlusCircle, label: "New Investigation", path: "/new" },
   { icon: History, label: "History", path: "/history" },
+  { icon: GitCompare, label: "Compare", path: "/compare" },
 ];
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";

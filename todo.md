@@ -18,4 +18,4 @@
 - [x] DashboardLayout with sidebar navigation
 - [x] Elegant, polished UI with refined typography and meticulous spacing
 - [x] Generate true PDF file for exports (not HTML)
-- [ ] Add report comparison functionality for past investigations (deferred - enhancement)
+- [x] Add report comparison functionality for past investigations

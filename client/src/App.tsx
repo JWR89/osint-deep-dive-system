@@ -10,6 +10,7 @@ import InvestigationReport from "./pages/InvestigationReport";
 import InvestigationProgress from "./pages/InvestigationProgress";
 import History from "./pages/History";
 import DashboardLayout from "./components/DashboardLayout";
+import Compare from "./pages/Compare";
 
 function Router() {
   return (
@@ -20,6 +21,7 @@ function Router() {
         <Route path={"/investigation/:id"} component={InvestigationReport} />
         <Route path={"/investigation/:id/progress"} component={InvestigationProgress} />
         <Route path={"/history"} component={History} />
+        <Route path={"/compare"} component={Compare} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

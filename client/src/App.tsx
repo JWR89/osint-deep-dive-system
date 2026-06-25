@@ -11,6 +11,9 @@ import InvestigationProgress from "./pages/InvestigationProgress";
 import History from "./pages/History";
 import DashboardLayout from "./components/DashboardLayout";
 import Compare from "./pages/Compare";
+import BulkInvestigation from "./pages/BulkInvestigation";
+import BulkJobStatus from "./pages/BulkJobStatus";
+import Alerts from "./pages/Alerts";
 
 function Router() {
   return (
@@ -22,6 +25,9 @@ function Router() {
         <Route path={"/investigation/:id/progress"} component={InvestigationProgress} />
         <Route path={"/history"} component={History} />
         <Route path={"/compare"} component={Compare} />
+        <Route path={"/bulk"} component={BulkInvestigation} />
+        <Route path={"/bulk/:id"} component={BulkJobStatus} />
+        <Route path={"/alerts"} component={Alerts} />
         <Route path={"/404"} component={NotFound} />
         <Route component={NotFound} />
       </Switch>

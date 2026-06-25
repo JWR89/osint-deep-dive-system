@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { trpc } from "@/lib/trpc";
 import { useLocation } from "wouter";
-import { PlusCircle, Search, Clock, CheckCircle2, AlertCircle, Loader2 } from "lucide-react";
+import { PlusCircle, Search, Clock, CheckCircle2, AlertCircle, Loader2, Bell, Users } from "lucide-react";
 
 const STATUS_CONFIG = {
   pending: { label: "Pending", icon: Clock, className: "bg-muted text-muted-foreground" },
@@ -71,6 +71,38 @@ export default function Home() {
               <p className="text-2xl font-bold text-foreground">
                 {investigations?.filter(i => i.status === "completed").length ?? 0}
               </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Feature Cards */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <Card
+          className="cursor-pointer hover:border-primary/50 transition-all duration-200 group border-border/50"
+          onClick={() => setLocation("/bulk")}
+        >
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="h-10 w-10 rounded-lg bg-purple-500/10 flex items-center justify-center">
+              <Users className="h-5 w-5 text-purple-400" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground text-sm">Bulk Investigation</p>
+              <p className="text-xs text-muted-foreground">Upload CSV to investigate multiple subjects</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card
+          className="cursor-pointer hover:border-primary/50 transition-all duration-200 group border-border/50"
+          onClick={() => setLocation("/alerts")}
+        >
+          <CardContent className="flex items-center gap-4 p-5">
+            <div className="h-10 w-10 rounded-lg bg-amber-500/10 flex items-center justify-center">
+              <Bell className="h-5 w-5 text-amber-400" />
+            </div>
+            <div>
+              <p className="font-medium text-foreground text-sm">Alerts & Monitoring</p>
+              <p className="text-xs text-muted-foreground">Track subjects for new public information</p>
             </div>
           </CardContent>
         </Card>

@@ -22,6 +22,20 @@
       "when": 1782349394799,
       "tag": "0002_tan_firestar",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1782350226301,
+      "tag": "0003_omniscient_clint_barton",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1782351000729,
+      "tag": "0004_bored_rafael_vega",
+      "breakpoints": true
     }
   ]
 }

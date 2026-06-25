@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Separator } from "@/components/ui/separator";
+import { Switch } from "@/components/ui/switch";
 import { trpc } from "@/lib/trpc";
 import { useLocation, useParams } from "wouter";
 import { useState } from "react";
@@ -10,8 +11,14 @@ import { toast } from "sonner";
 import {
   Download, ArrowLeft, Shield, Users, FileText,
   Scale, Heart, Briefcase, ExternalLink, Loader2,
-  CheckCircle2, AlertTriangle, HelpCircle
+  CheckCircle2, AlertTriangle, HelpCircle, Globe,
+  Clock, Network, MapPin, Bell, Database, Skull
 } from "lucide-react";
+import { RiskScore } from "@/components/RiskScore";
+import { Timeline } from "@/components/Timeline";
+import { RelationshipGraph } from "@/components/RelationshipGraph";
+import { GeolocationMap } from "@/components/GeolocationMap";
+import { Annotations } from "@/components/Annotations";
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
   identity: { label: "Identity", icon: Shield, color: "text-blue-400", bgColor: "bg-blue-400/10" },
@@ -20,6 +27,8 @@ const CATEGORY_CONFIG: Record<string, { label: string; icon: any; color: string;
   criminal: { label: "Criminal", icon: Scale, color: "text-red-400", bgColor: "bg-red-400/10" },
   dating: { label: "Dating", icon: Heart, color: "text-pink-400", bgColor: "bg-pink-400/10" },
   professional: { label: "Professional", icon: Briefcase, color: "text-amber-400", bgColor: "bg-amber-400/10" },
+  breaches: { label: "Data Breaches", icon: Database, color: "text-orange-400", bgColor: "bg-orange-400/10" },
+  dark_web: { label: "Dark Web", icon: Skull, color: "text-red-500", bgColor: "bg-red-500/10" },
 };
 
 const CONFIDENCE_CONFIG = {
@@ -51,6 +60,12 @@ export default function InvestigationReport() {
     },
   });
 
+  const toggleMonitoringMutation = trpc.investigation.toggleMonitoring.useMutation({
+    onSuccess: (result) => {
+      toast.success(result.enabled ? "Monitoring enabled" : "Monitoring disabled");
+    },
+  });
+
   const handleExport = () => {
     setIsExporting(true);
     exportMutation.mutate({ id });
@@ -77,6 +92,10 @@ export default function InvestigationReport() {
 
   const subjectDetails = investigation.subjectDetails as Record<string, string> | null;
   const categories = Object.keys(CATEGORY_CONFIG);
+  const riskBreakdown = investigation.riskBreakdown as any;
+  const relationships = (investigation.relationships as any[]) || [];
+  const timeline = (investigation.timeline as any[]) || [];
+  const geolocations = (investigation.geolocations as any[]) || [];
 
   return (
     <div className="space-y-6">
@@ -103,15 +122,31 @@ export default function InvestigationReport() {
             })}
           </p>
         </div>
-        <Button onClick={handleExport} disabled={isExporting} className="shrink-0">
-          {isExporting ? (
-            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-          ) : (
-            <Download className="h-4 w-4 mr-2" />
-          )}
-          Export Report
-        </Button>
+        <div className="flex items-center gap-3 shrink-0">
+          {/* Monitoring Toggle */}
+          <div className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border bg-card">
+            <Bell className="w-4 h-4 text-muted-foreground" />
+            <span className="text-xs text-muted-foreground">Monitor</span>
+            <Switch
+              checked={!!investigation.monitoringEnabled}
+              onCheckedChange={(checked) => toggleMonitoringMutation.mutate({ id, enabled: checked })}
+            />
+          </div>
+          <Button onClick={handleExport} disabled={isExporting}>
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            Export PDF
+          </Button>
+        </div>
       </div>
+
+      {/* Risk Score */}
+      {investigation.riskScore !== null && investigation.riskScore !== undefined && (
+        <RiskScore score={investigation.riskScore} breakdown={riskBreakdown} />
+      )}
 
       {/* Subject Summary Card */}
       <Card className="border-border/50">
@@ -147,7 +182,7 @@ export default function InvestigationReport() {
               </div>
             </div>
           </div>
-          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border">
+          <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border flex-wrap">
             <Badge variant="secondary" className="bg-primary/10 text-primary">
               {findings.length} Findings
             </Badge>
@@ -160,90 +195,185 @@ export default function InvestigationReport() {
             <Badge variant="secondary" className="bg-red-400/10 text-red-400">
               {findings.filter(f => f.confidence === "low").length} Low
             </Badge>
+            {findings.some(f => (f.corroborationCount || 1) > 1) && (
+              <Badge variant="secondary" className="bg-cyan-400/10 text-cyan-400">
+                {findings.filter(f => (f.corroborationCount || 1) > 1).length} Corroborated
+              </Badge>
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Category Tabs */}
-      <Tabs defaultValue="all" className="space-y-4">
+      {/* Analysis Tabs: Timeline, Relationships, Geolocation, Notes */}
+      <Tabs defaultValue="findings" className="space-y-4">
         <TabsList className="bg-card border border-border h-auto flex-wrap gap-1 p-1">
-          <TabsTrigger value="all" className="text-xs">
-            All ({findings.length})
+          <TabsTrigger value="findings" className="text-xs">
+            <FileText className="w-3.5 h-3.5 mr-1" />
+            Findings ({findings.length})
           </TabsTrigger>
-          {categories.map(cat => {
-            const config = CATEGORY_CONFIG[cat];
-            const count = groupedFindings[cat]?.length ?? 0;
-            return (
-              <TabsTrigger key={cat} value={cat} className="text-xs">
-                {config.label} ({count})
-              </TabsTrigger>
-            );
-          })}
+          <TabsTrigger value="timeline" className="text-xs">
+            <Clock className="w-3.5 h-3.5 mr-1" />
+            Timeline ({timeline.length})
+          </TabsTrigger>
+          <TabsTrigger value="relationships" className="text-xs">
+            <Network className="w-3.5 h-3.5 mr-1" />
+            Relationships ({relationships.length})
+          </TabsTrigger>
+          <TabsTrigger value="geolocation" className="text-xs">
+            <MapPin className="w-3.5 h-3.5 mr-1" />
+            Geolocation ({geolocations.length})
+          </TabsTrigger>
+          <TabsTrigger value="notes" className="text-xs">
+            <Globe className="w-3.5 h-3.5 mr-1" />
+            Case Notes
+          </TabsTrigger>
         </TabsList>
 
-        {/* All findings */}
-        <TabsContent value="all" className="space-y-4">
-          {categories.map(cat => {
-            const config = CATEGORY_CONFIG[cat];
-            const catFindings = groupedFindings[cat] || [];
-            if (catFindings.length === 0) return null;
-            const CategoryIcon = config.icon;
+        {/* Findings Tab */}
+        <TabsContent value="findings" className="space-y-4">
+          {/* Sub-tabs for categories */}
+          <Tabs defaultValue="all_cat" className="space-y-4">
+            <TabsList className="bg-muted/30 border border-border/50 h-auto flex-wrap gap-1 p-1">
+              <TabsTrigger value="all_cat" className="text-xs">
+                All ({findings.length})
+              </TabsTrigger>
+              {categories.map(cat => {
+                const config = CATEGORY_CONFIG[cat];
+                const count = groupedFindings[cat]?.length ?? 0;
+                if (count === 0) return null;
+                return (
+                  <TabsTrigger key={cat} value={cat} className="text-xs">
+                    {config.label} ({count})
+                  </TabsTrigger>
+                );
+              })}
+            </TabsList>
 
-            return (
-              <Card key={cat} className="border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <div className={`h-8 w-8 rounded-lg ${config.bgColor} flex items-center justify-center`}>
-                      <CategoryIcon className={`h-4 w-4 ${config.color}`} />
-                    </div>
-                    {config.label}
-                    <Badge variant="secondary" className="ml-auto text-xs">
-                      {catFindings.length} findings
-                    </Badge>
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {catFindings.map((finding, idx) => (
-                    <FindingCard key={finding.id || idx} finding={finding} />
-                  ))}
-                </CardContent>
-              </Card>
-            );
-          })}
+            {/* All findings */}
+            <TabsContent value="all_cat" className="space-y-4">
+              {categories.map(cat => {
+                const config = CATEGORY_CONFIG[cat];
+                const catFindings = groupedFindings[cat] || [];
+                if (catFindings.length === 0) return null;
+                const CategoryIcon = config.icon;
+
+                return (
+                  <Card key={cat} className="border-border/50">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <div className={`h-8 w-8 rounded-lg ${config.bgColor} flex items-center justify-center`}>
+                          <CategoryIcon className={`h-4 w-4 ${config.color}`} />
+                        </div>
+                        {config.label}
+                        <Badge variant="secondary" className="ml-auto text-xs">
+                          {catFindings.length} findings
+                        </Badge>
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {catFindings.map((finding, idx) => (
+                        <FindingCard key={finding.id || idx} finding={finding} />
+                      ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </TabsContent>
+
+            {/* Individual category tabs */}
+            {categories.map(cat => {
+              const config = CATEGORY_CONFIG[cat];
+              const catFindings = groupedFindings[cat] || [];
+              const CategoryIcon = config.icon;
+
+              return (
+                <TabsContent key={cat} value={cat} className="space-y-4">
+                  <Card className="border-border/50">
+                    <CardHeader className="pb-3">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <div className={`h-8 w-8 rounded-lg ${config.bgColor} flex items-center justify-center`}>
+                          <CategoryIcon className={`h-4 w-4 ${config.color}`} />
+                        </div>
+                        {config.label}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      {catFindings.length === 0 ? (
+                        <p className="text-sm text-muted-foreground italic py-4 text-center">
+                          No findings in this category.
+                        </p>
+                      ) : (
+                        catFindings.map((finding, idx) => (
+                          <FindingCard key={finding.id || idx} finding={finding} />
+                        ))
+                      )}
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+              );
+            })}
+          </Tabs>
         </TabsContent>
 
-        {/* Individual category tabs */}
-        {categories.map(cat => {
-          const config = CATEGORY_CONFIG[cat];
-          const catFindings = groupedFindings[cat] || [];
-          const CategoryIcon = config.icon;
+        {/* Timeline Tab */}
+        <TabsContent value="timeline">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Clock className="w-4 h-4 text-primary" />
+                Chronological Timeline
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Timeline events={timeline} />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          return (
-            <TabsContent key={cat} value={cat} className="space-y-4">
-              <Card className="border-border/50">
-                <CardHeader className="pb-3">
-                  <CardTitle className="text-base flex items-center gap-2">
-                    <div className={`h-8 w-8 rounded-lg ${config.bgColor} flex items-center justify-center`}>
-                      <CategoryIcon className={`h-4 w-4 ${config.color}`} />
-                    </div>
-                    {config.label}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3">
-                  {catFindings.length === 0 ? (
-                    <p className="text-sm text-muted-foreground italic py-4 text-center">
-                      No findings in this category.
-                    </p>
-                  ) : (
-                    catFindings.map((finding, idx) => (
-                      <FindingCard key={finding.id || idx} finding={finding} />
-                    ))
-                  )}
-                </CardContent>
-              </Card>
-            </TabsContent>
-          );
-        })}
+        {/* Relationships Tab */}
+        <TabsContent value="relationships">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Network className="w-4 h-4 text-primary" />
+                Link Analysis & Connections
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <RelationshipGraph relationships={relationships} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Geolocation Tab */}
+        <TabsContent value="geolocation">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <MapPin className="w-4 h-4 text-primary" />
+                Geolocation Intelligence
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <GeolocationMap locations={geolocations} />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Case Notes Tab */}
+        <TabsContent value="notes">
+          <Card className="border-border/50">
+            <CardHeader>
+              <CardTitle className="text-base flex items-center gap-2">
+                <Globe className="w-4 h-4 text-primary" />
+                Case Notes & Annotations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Annotations investigationId={id} />
+            </CardContent>
+          </Card>
+        </TabsContent>
       </Tabs>
     </div>
   );
@@ -252,15 +382,23 @@ export default function InvestigationReport() {
 function FindingCard({ finding }: { finding: any }) {
   const confidence = CONFIDENCE_CONFIG[finding.confidence as keyof typeof CONFIDENCE_CONFIG] || CONFIDENCE_CONFIG.medium;
   const ConfidenceIcon = confidence.icon;
+  const corroboration = finding.corroborationCount || 1;
 
   return (
     <div className="p-4 rounded-lg border border-border/50 bg-background/50 hover:border-border transition-colors">
       <div className="flex items-start justify-between gap-3 mb-2">
         <h4 className="text-sm font-semibold text-foreground leading-tight">{finding.title}</h4>
-        <Badge variant="outline" className={`shrink-0 text-[10px] ${confidence.color} border-current/20`}>
-          <ConfidenceIcon className="h-3 w-3 mr-1" />
-          {confidence.label}
-        </Badge>
+        <div className="flex items-center gap-2 shrink-0">
+          {corroboration > 1 && (
+            <Badge variant="secondary" className="text-[10px] bg-cyan-400/10 text-cyan-400">
+              {corroboration}x corroborated
+            </Badge>
+          )}
+          <Badge variant="outline" className={`text-[10px] ${confidence.color} border-current/20`}>
+            <ConfidenceIcon className="h-3 w-3 mr-1" />
+            {confidence.label}
+          </Badge>
+        </div>
       </div>
       <p className="text-sm text-muted-foreground leading-relaxed mb-3">{finding.content}</p>
       <Separator className="mb-3" />

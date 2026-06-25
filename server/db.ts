@@ -1,6 +1,12 @@
-import { desc, eq } from "drizzle-orm";
+import { desc, eq, and } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users, investigations, findings, InsertInvestigation, InsertFinding } from "../drizzle/schema";
+import {
+  InsertUser, users,
+  investigations, findings,
+  annotations, alerts, bulkJobs,
+  InsertInvestigation, InsertFinding,
+  InsertAnnotation, InsertAlert, InsertBulkJob
+} from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
@@ -109,7 +115,7 @@ export async function getUserInvestigations(userId: number) {
   return db.select().from(investigations).where(eq(investigations.userId, userId)).orderBy(desc(investigations.createdAt));
 }
 
-export async function updateInvestigation(id: number, data: Partial<Pick<typeof investigations.$inferSelect, 'status' | 'progress' | 'currentSource' | 'completedAt' | 'pdfUrl' | 'pdfKey'>>) {
+export async function updateInvestigation(id: number, data: Partial<Pick<typeof investigations.$inferSelect, 'status' | 'progress' | 'currentSource' | 'completedAt' | 'pdfUrl' | 'pdfKey' | 'riskScore' | 'riskBreakdown' | 'relationships' | 'timeline' | 'geolocations' | 'monitoringEnabled' | 'lastMonitoredAt' | 'monitoringTaskUid'>>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(investigations).set(data).where(eq(investigations.id, id));
@@ -118,6 +124,8 @@ export async function updateInvestigation(id: number, data: Partial<Pick<typeof 
 export async function deleteInvestigation(id: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
+  await db.delete(annotations).where(eq(annotations.investigationId, id));
+  await db.delete(alerts).where(eq(alerts.investigationId, id));
   await db.delete(findings).where(eq(findings.investigationId, id));
   await db.delete(investigations).where(eq(investigations.id, id));
 }
@@ -142,4 +150,109 @@ export async function getInvestigationFindings(investigationId: number) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return db.select().from(findings).where(eq(findings.investigationId, investigationId)).orderBy(findings.category, findings.createdAt);
+}
+
+// --- Annotations Helpers ---
+
+export async function createAnnotation(data: InsertAnnotation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(annotations).values(data);
+  return result[0].insertId;
+}
+
+export async function getInvestigationAnnotations(investigationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(annotations).where(eq(annotations.investigationId, investigationId)).orderBy(desc(annotations.createdAt));
+}
+
+export async function getAnnotationById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(annotations).where(eq(annotations.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function updateAnnotation(id: number, data: Partial<Pick<typeof annotations.$inferSelect, 'content' | 'tag' | 'highlighted'>>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(annotations).set(data).where(eq(annotations.id, id));
+}
+
+export async function deleteAnnotation(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(annotations).where(eq(annotations.id, id));
+}
+
+// --- Alerts Helpers ---
+
+export async function createAlert(data: InsertAlert) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(alerts).values(data);
+  return result[0].insertId;
+}
+
+export async function getUserAlerts(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(alerts).where(eq(alerts.userId, userId)).orderBy(desc(alerts.createdAt));
+}
+
+export async function getAlertById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(alerts).where(eq(alerts.id, id)).limit(1);
+  return result.length > 0 ? result[0] : undefined;
+}
+
+export async function markAlertRead(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(alerts).set({ isRead: true }).where(eq(alerts.id, id));
+}
+
+export async function getUnreadAlertCount(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(alerts).where(and(eq(alerts.userId, userId), eq(alerts.isRead, false)));
+  return result.length;
+}
+
+// --- Bulk Jobs Helpers ---
+
+export async function createBulkJob(data: InsertBulkJob) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(bulkJobs).values(data);
+  return result[0].insertId;
+}
+
+export async function getBulkJobById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(bulkJobs).where(eq(bulkJobs.id, id)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function getUserBulkJobs(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(bulkJobs).where(eq(bulkJobs.userId, userId)).orderBy(desc(bulkJobs.createdAt));
+}
+
+export async function updateBulkJob(id: number, data: Partial<Pick<typeof bulkJobs.$inferSelect, 'status' | 'completedSubjects' | 'investigationIds'>>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(bulkJobs).set(data).where(eq(bulkJobs.id, id));
+}
+
+// --- Monitoring Helpers ---
+
+export async function getMonitoredInvestigations() {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(investigations).where(eq(investigations.monitoringEnabled, true));
 }

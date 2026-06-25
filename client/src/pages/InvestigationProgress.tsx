@@ -6,7 +6,7 @@ import { useLocation, useParams } from "wouter";
 import { useEffect } from "react";
 import {
   Loader2, CheckCircle2, Circle, Shield, Users, FileText,
-  Scale, Heart, Briefcase, AlertCircle
+  Scale, Heart, Briefcase, AlertCircle, Database, Skull
 } from "lucide-react";
 
 const CATEGORY_CONFIG = {
@@ -16,6 +16,8 @@ const CATEGORY_CONFIG = {
   criminal: { label: "Criminal", icon: Scale, color: "text-red-400" },
   dating: { label: "Dating", icon: Heart, color: "text-pink-400" },
   professional: { label: "Professional", icon: Briefcase, color: "text-amber-400" },
+  breaches: { label: "Data Breaches", icon: Database, color: "text-orange-400" },
+  dark_web: { label: "Dark Web", icon: Skull, color: "text-red-500" },
 };
 
 const DATA_SOURCES = [
@@ -40,6 +42,12 @@ const DATA_SOURCES = [
   { name: "Employment & Business Records", category: "professional" },
   { name: "Professional Licenses & Certifications", category: "professional" },
   { name: "Domain & Website Ownership", category: "professional" },
+  { name: "HaveIBeenPwned Database", category: "breaches" },
+  { name: "Credential Leak Archives", category: "breaches" },
+  { name: "Data Breach Aggregators", category: "breaches" },
+  { name: "Dark Web Forum Mentions", category: "dark_web" },
+  { name: "Paste Site Scanning", category: "dark_web" },
+  { name: "Tor Hidden Service Indexing", category: "dark_web" },
 ];
 
 export default function InvestigationProgress() {

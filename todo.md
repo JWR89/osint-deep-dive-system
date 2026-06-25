@@ -23,3 +23,13 @@
 - [x] Store uploaded image via S3 storage
 - [x] Include reverse image search in the OSINT engine investigation flow
 - [x] Display uploaded photo in the report dashboard
+- [x] Threat/Risk Score (1-100) computed from findings, displayed at top of report
+- [x] Relationship Mapping / Link Analysis visual graph (associates, employers, addresses, accounts)
+- [x] Timeline View showing chronological events (job changes, moves, social activity, arrests)
+- [x] Email Breach Check (HaveIBeenPwned-style breach detection)
+- [x] Dark Web Mention Scan (paste sites, dark web mentions of email/username/phone)
+- [x] Geolocation Intelligence map view (addresses, check-ins, geotagged posts)
+- [x] Alert/Monitoring Mode (ongoing monitoring with notifications for new findings)
+- [x] Confidence Scoring Improvements (corroboration weighting across sources)
+- [x] Bulk Investigation (CSV upload for batch investigations)
+- [x] Report Annotations (user notes, tags, highlights on findings)

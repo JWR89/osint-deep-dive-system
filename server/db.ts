@@ -1,11 +1,10 @@
-import { eq } from "drizzle-orm";
+import { desc, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
-import { InsertUser, users } from "../drizzle/schema";
+import { InsertUser, users, investigations, findings, InsertInvestigation, InsertFinding } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
 let _db: ReturnType<typeof drizzle> | null = null;
 
-// Lazily create the drizzle instance so local tooling can run without a DB.
 export async function getDb() {
   if (!_db && process.env.DATABASE_URL) {
     try {
@@ -85,8 +84,62 @@ export async function getUserByOpenId(openId: string) {
   }
 
   const result = await db.select().from(users).where(eq(users.openId, openId)).limit(1);
-
   return result.length > 0 ? result[0] : undefined;
 }
 
-// TODO: add feature queries here as your schema grows.
+// --- Investigation Helpers ---
+
+export async function createInvestigation(data: InsertInvestigation) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(investigations).values(data);
+  return result[0].insertId;
+}
+
+export async function getInvestigationById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.select().from(investigations).where(eq(investigations.id, id)).limit(1);
+  return result[0] ?? null;
+}
+
+export async function getUserInvestigations(userId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(investigations).where(eq(investigations.userId, userId)).orderBy(desc(investigations.createdAt));
+}
+
+export async function updateInvestigation(id: number, data: Partial<Pick<typeof investigations.$inferSelect, 'status' | 'progress' | 'currentSource' | 'completedAt' | 'pdfUrl' | 'pdfKey'>>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(investigations).set(data).where(eq(investigations.id, id));
+}
+
+export async function deleteInvestigation(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(findings).where(eq(findings.investigationId, id));
+  await db.delete(investigations).where(eq(investigations.id, id));
+}
+
+// --- Findings Helpers ---
+
+export async function addFinding(data: InsertFinding) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const result = await db.insert(findings).values(data);
+  return result[0].insertId;
+}
+
+export async function addFindings(data: InsertFinding[]) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  if (data.length === 0) return;
+  await db.insert(findings).values(data);
+}
+
+export async function getInvestigationFindings(investigationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(findings).where(eq(findings.investigationId, investigationId)).orderBy(findings.category, findings.createdAt);
+}

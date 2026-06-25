@@ -1,0 +1,21 @@
+# Project TODO
+
+- [x] Dark theme with elegant, sophisticated color palette
+- [x] Google Fonts integration (Inter for UI, serif for headings)
+- [x] Database schema for investigations, findings, and report categories
+- [x] Backend OSINT engine using LLM to aggregate and cross-reference public data
+- [x] Input form to enter subject name + known details (age, location, email, phone, username)
+- [x] AI-powered investigation across social media (Facebook, Instagram, Twitter/X, LinkedIn, TikTok, YouTube)
+- [x] Username search across 400+ platforms (Reddit, GitHub, forums, niche sites)
+- [x] Public records lookup (address history, phone numbers, relatives, associates)
+- [x] Arrest records and criminal history search
+- [x] Dating site presence detection
+- [x] Structured report dashboard with 6 categories: Identity, Social Media, Public Records, Criminal, Dating, Professional
+- [x] Full source citations with every finding
+- [x] Real-time progress indicator showing active data source queries
+- [x] PDF export of full report
+- [x] Investigation history (save, revisit, compare past reports)
+- [x] DashboardLayout with sidebar navigation
+- [x] Elegant, polished UI with refined typography and meticulous spacing
+- [x] Generate true PDF file for exports (not HTML)
+- [ ] Add report comparison functionality for past investigations (deferred - enhancement)

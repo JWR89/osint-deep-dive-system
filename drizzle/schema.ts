@@ -1,17 +1,7 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
+import { int, json, mysqlEnum, mysqlTable, text, timestamp, varchar } from "drizzle-orm/mysql-core";
 
-/**
- * Core user table backing auth flow.
- * Extend this file with additional tables as your product grows.
- * Columns use camelCase to match both database fields and generated types.
- */
 export const users = mysqlTable("users", {
-  /**
-   * Surrogate primary key. Auto-incremented numeric value managed by the database.
-   * Use this for relations between tables.
-   */
   id: int("id").autoincrement().primaryKey(),
-  /** Manus OAuth identifier (openId) returned from the OAuth callback. Unique per user. */
   openId: varchar("openId", { length: 64 }).notNull().unique(),
   name: text("name"),
   email: varchar("email", { length: 320 }),
@@ -22,7 +12,37 @@ export const users = mysqlTable("users", {
   lastSignedIn: timestamp("lastSignedIn").defaultNow().notNull(),
 });
 
+export const investigations = mysqlTable("investigations", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  subjectName: varchar("subjectName", { length: 255 }).notNull(),
+  subjectDetails: json("subjectDetails"),
+  status: mysqlEnum("status", ["pending", "running", "completed", "failed"]).default("pending").notNull(),
+  progress: int("progress").default(0).notNull(),
+  currentSource: varchar("currentSource", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+  completedAt: timestamp("completedAt"),
+  pdfUrl: varchar("pdfUrl", { length: 512 }),
+  pdfKey: varchar("pdfKey", { length: 512 }),
+});
+
+export const findings = mysqlTable("findings", {
+  id: int("id").autoincrement().primaryKey(),
+  investigationId: int("investigationId").notNull(),
+  category: mysqlEnum("category", ["identity", "social_media", "public_records", "criminal", "dating", "professional"]).notNull(),
+  title: varchar("title", { length: 512 }).notNull(),
+  content: text("content").notNull(),
+  source: varchar("source", { length: 512 }).notNull(),
+  sourceUrl: varchar("sourceUrl", { length: 1024 }),
+  confidence: mysqlEnum("confidence", ["high", "medium", "low"]).default("medium").notNull(),
+  metadata: json("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
-
-// TODO: Add your tables here
+export type Investigation = typeof investigations.$inferSelect;
+export type InsertInvestigation = typeof investigations.$inferInsert;
+export type Finding = typeof findings.$inferSelect;
+export type InsertFinding = typeof findings.$inferInsert;

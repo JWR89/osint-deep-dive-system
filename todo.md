@@ -33,3 +33,4 @@
 - [x] Confidence Scoring Improvements (corroboration weighting across sources)
 - [x] Bulk Investigation (CSV upload for batch investigations)
 - [x] Report Annotations (user notes, tags, highlights on findings)
+- [x] Add prominent PDF export button to the report page with download functionality

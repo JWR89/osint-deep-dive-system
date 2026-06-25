@@ -132,13 +132,18 @@ export default function InvestigationReport() {
               onCheckedChange={(checked) => toggleMonitoringMutation.mutate({ id, enabled: checked })}
             />
           </div>
-          <Button onClick={handleExport} disabled={isExporting}>
+          <Button 
+            onClick={handleExport} 
+            disabled={isExporting}
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 font-semibold px-6 transition-all duration-200 active:scale-[0.97]"
+          >
             {isExporting ? (
               <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
               <Download className="h-4 w-4 mr-2" />
             )}
-            Export PDF
+            {isExporting ? "Generating PDF..." : "Download PDF Report"}
           </Button>
         </div>
       </div>
@@ -375,6 +380,34 @@ export default function InvestigationReport() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Sticky bottom export bar */}
+      <div className="sticky bottom-0 left-0 right-0 z-10 mt-8">
+        <div className="bg-card/95 backdrop-blur-sm border border-border rounded-xl p-4 shadow-xl flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+              <FileText className="h-5 w-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">Full Report Ready</p>
+              <p className="text-xs text-muted-foreground">{findings.length} findings across {Object.keys(groupedFindings).filter(k => (groupedFindings[k]?.length || 0) > 0).length} categories</p>
+            </div>
+          </div>
+          <Button 
+            onClick={handleExport} 
+            disabled={isExporting}
+            size="lg"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground shadow-lg shadow-primary/20 font-semibold px-6 transition-all duration-200 active:scale-[0.97]"
+          >
+            {isExporting ? (
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+            ) : (
+              <Download className="h-4 w-4 mr-2" />
+            )}
+            {isExporting ? "Generating..." : "Download PDF Report"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 }

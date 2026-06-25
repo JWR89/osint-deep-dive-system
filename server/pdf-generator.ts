@@ -419,10 +419,30 @@ export async function generatePdfReport(
   doc.text("This report contains publicly available information only. All sources are cited.", margin, y);
   doc.setTextColor(0);
 
-  // Add page footers to all pages
+  // Add watermark and page footers to all pages
   const totalPages = doc.getNumberOfPages();
   for (let i = 1; i <= totalPages; i++) {
     doc.setPage(i);
+
+    // Diagonal CONFIDENTIAL watermark
+    doc.saveGraphicsState();
+    // @ts-ignore - setGState is available in jsPDF
+    const gState = new (doc as any).GState({ opacity: 0.06 });
+    // @ts-ignore
+    doc.setGState(gState);
+    doc.setFontSize(72);
+    doc.setFont("helvetica", "bold");
+    doc.setTextColor(220, 38, 38);
+    // Rotate text diagonally across the page center
+    const centerX = pageWidth / 2;
+    const centerY = pageHeight / 2;
+    doc.text("CONFIDENTIAL", centerX, centerY, {
+      align: "center",
+      angle: 45,
+    });
+    doc.restoreGraphicsState();
+
+    // Page footer
     doc.setFontSize(7);
     doc.setFont("helvetica", "normal");
     doc.setTextColor(150);

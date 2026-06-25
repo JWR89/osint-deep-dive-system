@@ -34,3 +34,4 @@
 - [x] Bulk Investigation (CSV upload for batch investigations)
 - [x] Report Annotations (user notes, tags, highlights on findings)
 - [x] Add prominent PDF export button to the report page with download functionality
+- [x] Add diagonal CONFIDENTIAL watermark to every page of the exported PDF

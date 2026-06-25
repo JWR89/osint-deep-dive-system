@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
+import { PasscodeGate } from "./components/PasscodeGate";
 import Home from "./pages/Home";
 import NewInvestigation from "./pages/NewInvestigation";
 import InvestigationReport from "./pages/InvestigationReport";
@@ -41,7 +42,9 @@ function App() {
       <ThemeProvider defaultTheme="dark">
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <PasscodeGate>
+            <Router />
+          </PasscodeGate>
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

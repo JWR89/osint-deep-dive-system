@@ -115,7 +115,7 @@ export async function getUserInvestigations(userId: number) {
   return db.select().from(investigations).where(eq(investigations.userId, userId)).orderBy(desc(investigations.createdAt));
 }
 
-export async function updateInvestigation(id: number, data: Partial<Pick<typeof investigations.$inferSelect, 'status' | 'progress' | 'currentSource' | 'completedAt' | 'pdfUrl' | 'pdfKey' | 'riskScore' | 'riskBreakdown' | 'relationships' | 'timeline' | 'geolocations' | 'monitoringEnabled' | 'lastMonitoredAt' | 'monitoringTaskUid'>>) {
+export async function updateInvestigation(id: number, data: Partial<Pick<typeof investigations.$inferSelect, 'status' | 'progress' | 'currentSource' | 'completedAt' | 'pdfUrl' | 'pdfKey' | 'riskScore' | 'riskBreakdown' | 'relationships' | 'timeline' | 'geolocations' | 'monitoringEnabled' | 'lastMonitoredAt' | 'monitoringTaskUid' | 'executiveSummary' | 'patternOfLife' | 'financialFootprint' | 'vehicleAssets' | 'networkAnalysis' | 'digitalFingerprint' | 'aliases' | 'communicationPatterns' | 'threatMatrix' | 'deceptionIndicators' | 'mediaSentiment' | 'domainInfrastructure' | 'courtDocuments' | 'professionalVerification'>>) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   await db.update(investigations).set(data).where(eq(investigations.id, id));

@@ -116,18 +116,36 @@ export default function InvestigationReport() {
       {/* Subject Summary Card */}
       <Card className="border-border/50">
         <CardContent className="p-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {subjectDetails && Object.entries(subjectDetails)
-              .filter(([key, value]) => value && key !== "additionalInfo")
-              .map(([key, value]) => (
-                <div key={key} className="space-y-1">
-                  <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
-                    {key.replace(/([A-Z])/g, ' $1').trim()}
-                  </p>
-                  <p className="text-sm text-foreground font-medium">{value}</p>
+          <div className="flex gap-6">
+            {/* Subject Photo */}
+            {investigation.imageUrl && (
+              <div className="shrink-0">
+                <div className="w-28 h-28 rounded-xl overflow-hidden border-2 border-border bg-muted">
+                  <img
+                    src={investigation.imageUrl}
+                    alt={`Subject: ${investigation.subjectName}`}
+                    className="w-full h-full object-cover"
+                  />
                 </div>
-              ))
-            }
+                <p className="text-[10px] text-muted-foreground text-center mt-1.5 font-medium">Subject Photo</p>
+              </div>
+            )}
+            {/* Details Grid */}
+            <div className="flex-1">
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                {subjectDetails && Object.entries(subjectDetails)
+                  .filter(([key, value]) => value && !['additionalInfo', 'imageUrl', 'imageKey'].includes(key))
+                  .map(([key, value]) => (
+                    <div key={key} className="space-y-1">
+                      <p className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
+                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                      </p>
+                      <p className="text-sm text-foreground font-medium">{value as string}</p>
+                    </div>
+                  ))
+                }
+              </div>
+            </div>
           </div>
           <div className="flex items-center gap-4 mt-4 pt-4 border-t border-border">
             <Badge variant="secondary" className="bg-primary/10 text-primary">

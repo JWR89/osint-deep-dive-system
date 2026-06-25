@@ -11,6 +11,7 @@ export type SubjectDetails = {
   username?: string;
   employer?: string;
   additionalInfo?: string;
+  imageUrl?: string;
 };
 
 type CategoryType = "identity" | "social_media" | "public_records" | "criminal" | "dating" | "professional";
@@ -24,6 +25,7 @@ interface OSINTSource {
 const OSINT_SOURCES: OSINTSource[] = [
   // Identity
   { name: "Identity Verification & Cross-Reference", category: "identity", description: "Full name variations, aliases, age verification, known addresses, identity correlation" },
+  { name: "Reverse Image Search & Facial Recognition", category: "identity", description: "Google Reverse Image Search, TinEye, Yandex Images, PimEyes facial recognition, social media photo matching" },
   // Social Media
   { name: "Facebook Profile Search", category: "social_media", description: "Facebook public profiles, posts, friends lists, check-ins" },
   { name: "Instagram Discovery", category: "social_media", description: "Instagram accounts, posts, tagged photos, bio information" },
@@ -71,6 +73,7 @@ function buildInvestigationPrompt(subject: SubjectDetails, sources: OSINTSource[
     subject.username ? `Known Username(s): ${subject.username}` : null,
     subject.employer ? `Known Employer: ${subject.employer}` : null,
     subject.additionalInfo ? `Additional Info: ${subject.additionalInfo}` : null,
+    subject.imageUrl ? `Subject Photo: A photograph of the subject has been provided for reverse image search and facial recognition analysis` : null,
   ].filter(Boolean).join("\n");
 
   const sourcesDesc = sources.map(s => `- ${s.name}: ${s.description}`).join("\n");

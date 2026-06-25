@@ -13,6 +13,7 @@ import {
 } from "./db";
 import { runInvestigation, getOSINTSources } from "./osint-engine";
 import { generatePdfReport } from "./pdf-generator";
+import { storagePut } from "./storage";
 import { TRPCError } from "@trpc/server";
 
 export const appRouter = router({
@@ -27,6 +28,20 @@ export const appRouter = router({
   }),
 
   investigation: router({
+    // Upload subject image
+    uploadImage: protectedProcedure
+      .input(z.object({
+        fileName: z.string(),
+        fileData: z.string(), // base64 encoded
+        mimeType: z.string(),
+      }))
+      .mutation(async ({ ctx, input }) => {
+        const buffer = Buffer.from(input.fileData, "base64");
+        const fileKey = `investigations/${ctx.user.id}/${Date.now()}-${input.fileName}`;
+        const { key, url } = await storagePut(fileKey, buffer, input.mimeType);
+        return { key, url };
+      }),
+
     // Start a new investigation
     start: protectedProcedure
       .input(z.object({
@@ -38,6 +53,8 @@ export const appRouter = router({
         username: z.string().optional(),
         employer: z.string().optional(),
         additionalInfo: z.string().optional(),
+        imageUrl: z.string().optional(),
+        imageKey: z.string().optional(),
       }))
       .mutation(async ({ ctx, input }) => {
         const investigationId = await createInvestigation({
@@ -46,6 +63,8 @@ export const appRouter = router({
           subjectDetails: input,
           status: "pending",
           progress: 0,
+          imageUrl: input.imageUrl || null,
+          imageKey: input.imageKey || null,
         });
 
         // Run investigation in background (non-blocking)
@@ -58,6 +77,7 @@ export const appRouter = router({
           username: input.username,
           employer: input.employer,
           additionalInfo: input.additionalInfo,
+          imageUrl: input.imageUrl,
         }).catch(err => {
           console.error("[Investigation] Background run failed:", err);
         });

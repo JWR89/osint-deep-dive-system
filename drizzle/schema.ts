@@ -25,6 +25,8 @@ export const investigations = mysqlTable("investigations", {
   completedAt: timestamp("completedAt"),
   pdfUrl: varchar("pdfUrl", { length: 512 }),
   pdfKey: varchar("pdfKey", { length: 512 }),
+  imageUrl: varchar("imageUrl", { length: 512 }),
+  imageKey: varchar("imageKey", { length: 512 }),
 });
 
 export const findings = mysqlTable("findings", {

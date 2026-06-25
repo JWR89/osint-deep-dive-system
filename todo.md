@@ -19,3 +19,7 @@
 - [x] Elegant, polished UI with refined typography and meticulous spacing
 - [x] Generate true PDF file for exports (not HTML)
 - [x] Add report comparison functionality for past investigations
+- [x] Add image upload field to the New Investigation form
+- [x] Store uploaded image via S3 storage
+- [x] Include reverse image search in the OSINT engine investigation flow
+- [x] Display uploaded photo in the report dashboard

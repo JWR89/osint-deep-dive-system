@@ -15,6 +15,13 @@
       "when": 1782348268094,
       "tag": "0001_loose_crusher_hogan",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1782349394799,
+      "tag": "0002_tan_firestar",
+      "breakpoints": true
     }
   ]
 }

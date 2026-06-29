@@ -43,6 +43,13 @@
       "when": 1782353196537,
       "tag": "0005_omniscient_luminals",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1782591871202,
+      "tag": "0006_tidy_logan",
+      "breakpoints": true
     }
   ]
 }

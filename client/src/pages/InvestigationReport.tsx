@@ -28,6 +28,7 @@ import { DeceptionIndicators } from "@/components/DeceptionIndicators";
 import { CommunicationPatterns } from "@/components/CommunicationPatterns";
 import { AliasResolution } from "@/components/AliasResolution";
 import { SourceReliabilityBadge } from "@/components/SourceReliabilityBadge";
+import PsychologicalProfileComponent from "@/components/PsychologicalProfile";
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
   identity: { label: "Identity", icon: Shield, color: "text-blue-400", bgColor: "bg-blue-400/10" },
@@ -208,6 +209,7 @@ export default function InvestigationReport() {
         <TabsList className="bg-card border border-border h-auto flex-wrap gap-1 p-1">
           <TabsTrigger value="findings" className="text-xs"><FileText className="w-3.5 h-3.5 mr-1" />Findings ({findings.length})</TabsTrigger>
           <TabsTrigger value="intelligence" className="text-xs"><Brain className="w-3.5 h-3.5 mr-1" />Intelligence</TabsTrigger>
+          <TabsTrigger value="psychology" className="text-xs"><MessageSquare className="w-3.5 h-3.5 mr-1" />Psychology</TabsTrigger>
           <TabsTrigger value="threat" className="text-xs"><Shield className="w-3.5 h-3.5 mr-1" />Threat Matrix</TabsTrigger>
           <TabsTrigger value="timeline" className="text-xs"><Clock className="w-3.5 h-3.5 mr-1" />Timeline ({timeline.length})</TabsTrigger>
           <TabsTrigger value="relationships" className="text-xs"><Network className="w-3.5 h-3.5 mr-1" />Network</TabsTrigger>
@@ -343,7 +345,15 @@ export default function InvestigationReport() {
           )}
         </TabsContent>
 
-        {/* Threat Matrix Tab */}
+        {/* Psychology Tab */}
+        <TabsContent value="psychology">
+          <Card className="border-border/50">
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><MessageSquare className="w-4 h-4 text-primary" />Psychological Profile Analysis</CardTitle></CardHeader>
+            <CardContent>{investigation.psychologicalProfile ? <PsychologicalProfileComponent profile={investigation.psychologicalProfile} /> : <p className="text-sm text-muted-foreground italic">No psychological profile data available. Run investigation with social media scraping enabled.</p>}</CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Threat Assessment Tab */}
         <TabsContent value="threat">
           <Card className="border-border/50">
             <CardHeader className="pb-3">

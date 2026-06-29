@@ -95,6 +95,49 @@ export const alerts = mysqlTable("alerts", {
   createdAt: timestamp("createdAt").defaultNow().notNull(),
 });
 
+// API integration cache and raw data storage
+export const apiCache = mysqlTable("apiCache", {
+  id: int("id").autoincrement().primaryKey(),
+  investigationId: int("investigationId").notNull(),
+  apiProvider: varchar("apiProvider", { length: 100 }).notNull(), // 'pipl', 'spokeo', 'whois', 'news', 'breach', 'phone', 'social'
+  rawData: json("rawData").notNull(),
+  processedFindings: int("processedFindings").default(0),
+  status: mysqlEnum("status", ["pending", "success", "failed"]).default("pending"),
+  error: text("error"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  expiresAt: timestamp("expiresAt"), // cache expiration
+});
+
+// ML-derived patterns and insights
+export const mlInsights = mysqlTable("mlInsights", {
+  id: int("id").autoincrement().primaryKey(),
+  investigationId: int("investigationId").notNull(),
+  userId: int("userId").notNull(),
+  insightType: varchar("insightType", { length: 100 }).notNull(), // 'pattern', 'prediction', 'anomaly', 'risk_factor'
+  title: varchar("title", { length: 255 }).notNull(),
+  description: text("description").notNull(),
+  confidence: int("confidence").notNull(), // 0-100
+  relatedInvestigationIds: json("relatedInvestigationIds"), // array of investigation IDs
+  metadata: json("metadata"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+});
+
+// Cross-subject comparison results
+export const subjectComparisons = mysqlTable("subjectComparisons", {
+  id: int("id").autoincrement().primaryKey(),
+  userId: int("userId").notNull(),
+  investigationId1: int("investigationId1").notNull(),
+  investigationId2: int("investigationId2").notNull(),
+  connectionStrength: int("connectionStrength").notNull(), // 0-100
+  sharedConnections: json("sharedConnections"), // array of shared entities
+  sharedLocations: json("sharedLocations"), // array of shared addresses
+  sharedSocialAccounts: json("sharedSocialAccounts"), // array of shared usernames
+  temporalOverlap: json("temporalOverlap"), // time periods when both were active in same location
+  riskIndicators: json("riskIndicators"), // array of concerning patterns
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export const bulkJobs = mysqlTable("bulkJobs", {
   id: int("id").autoincrement().primaryKey(),
   userId: int("userId").notNull(),
@@ -118,3 +161,9 @@ export type Alert = typeof alerts.$inferSelect;
 export type InsertAlert = typeof alerts.$inferInsert;
 export type BulkJob = typeof bulkJobs.$inferSelect;
 export type InsertBulkJob = typeof bulkJobs.$inferInsert;
+export type ApiCache = typeof apiCache.$inferSelect;
+export type InsertApiCache = typeof apiCache.$inferInsert;
+export type MlInsight = typeof mlInsights.$inferSelect;
+export type InsertMlInsight = typeof mlInsights.$inferInsert;
+export type SubjectComparison = typeof subjectComparisons.$inferSelect;
+export type InsertSubjectComparison = typeof subjectComparisons.$inferInsert;

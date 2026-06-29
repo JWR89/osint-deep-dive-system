@@ -51,3 +51,66 @@
 - [x] Domain & Infrastructure OSINT (websites owned, WHOIS, SSL certs, hosting)
 - [x] Court Document Deep Dive (civil cases, restraining orders, lawsuits filed BY subject)
 - [x] Professional Verification (license, education, military, certifications)
+
+## Phase 2: Real API Integrations & Advanced ML Analysis
+
+### Intelligence Depth - Real API Integrations
+- [ ] Pipl API integration (people search, email lookup, phone lookup)
+- [ ] Spokeo API integration (background checks, address history, relatives)
+- [ ] WHOIS API integration (domain registration, ownership, history)
+- [ ] News API integration (news mentions, sentiment analysis, controversies)
+- [ ] HaveIBeenPwned API integration (email breach history with breach details)
+- [ ] Phone number lookup API (carrier info, line type, location)
+- [ ] Social media scraping (Twitter/X, Instagram, TikTok posts, followers, engagement)
+- [ ] Real data aggregation layer (deduplicate, cross-reference, enrich findings)
+
+### Advanced Analysis - ML & Pattern Detection
+- [ ] ML pattern detection engine (find connections across multiple investigations)
+- [ ] Automated risk scoring based on historical data and patterns
+- [ ] Predictive indicators (likelihood of future activity, behavioral prediction)
+- [ ] Cross-subject comparison tool (find connections between two subjects)
+- [ ] Anomaly detection (unusual activity patterns, red flags)
+- [ ] Relationship strength scoring (how connected are two subjects)
+- [ ] Temporal analysis (when did connections form, activity trends over time)
+- [ ] New "Insights" tab in report showing ML-derived patterns and predictions
+
+
+## Phase 3: Advanced Psychological & Behavioral Analysis (NEW)
+
+- [ ] Psychological Profile Generator (analyzes social media posts for personality traits, mental state, behavioral patterns)
+- [ ] Sentiment Analysis of posts (positive, negative, neutral, aggressive, depressive indicators)
+- [ ] Personality Trait Detection (Big Five: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
+- [ ] Behavioral Pattern Analysis (posting frequency, response times, interaction style, aggression levels)
+- [ ] Psychological Risk Indicators (depression, anxiety, suicidal ideation, violence indicators)
+- [ ] Linguistic Analysis (writing style, vocabulary, grammar patterns, unique phrases)
+- [ ] Emotional State Timeline (track emotional changes over time from posts)
+- [ ] Psychological Profile Report Tab (new dashboard tab with findings)
+
+
+## Phase 4: Social Media Scraping & Real Data Integration
+
+- [ ] Puppeteer-based web scraper module (X, Reddit, dating sites, public profiles)
+- [ ] X/Twitter scraper (search username, extract posts, followers, engagement)
+- [ ] Reddit scraper (search username, extract posts, comments, subreddits)
+- [ ] Dating site scrapers (Match, Bumble, Hinge, OkCupid, Tinder - public profiles)
+- [ ] Generic public profile scraper (LinkedIn, GitHub, personal websites)
+- [ ] Facebook Graph API integration (posts, profile info, friends list)
+- [ ] Instagram Graph API integration (posts, followers, engagement, bio)
+- [ ] Post storage and deduplication in database
+- [ ] Scraping progress tracking and real-time UI updates
+- [ ] Rate limiting and anti-detection (rotate user agents, delays)
+- [ ] Error handling and retry logic for failed scrapes
+
+## Phase 5: Psychological Profiling Integration
+
+- [ ] Integrate psychological profile module into investigation engine
+- [ ] Run psychological analysis on all scraped social media posts
+- [ ] Extract personality traits from complete post history
+- [ ] Identify communication preferences and social tendencies
+- [ ] Detect stress triggers and emotional vulnerabilities
+- [ ] Create "Psychological Profile" dashboard tab
+- [ ] Display Big Five traits with visual breakdown
+- [ ] Show risk indicators (depression, violence, paranoia, etc.)
+- [ ] Display emotional timeline (sentiment over time)
+- [ ] Show concern flags and red alerts
+- [ ] Include psychological profile in PDF export

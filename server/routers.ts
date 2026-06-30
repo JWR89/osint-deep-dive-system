@@ -24,6 +24,11 @@ import {
   getBulkJobById,
   getUserBulkJobs,
   updateBulkJob,
+  createSocialMediaProfile,
+  getSocialMediaProfiles,
+  getSocialMediaProfileById,
+  updateSocialMediaProfile,
+  deleteSocialMediaProfile,
 } from "./db";
 import { runInvestigation, getOSINTSources } from "./osint-engine";
 import { generatePdfReport } from "./pdf-generator";
@@ -431,6 +436,129 @@ export const appRouter = router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return getUserBulkJobs(ctx.user.id);
     }),
+  }),
+
+  socialMedia: router({
+    // Get all social media profiles for an investigation
+    getProfiles: protectedProcedure
+      .input(z.object({ investigationId: z.number() }))
+      .query(async ({ input }) => {
+        return getSocialMediaProfiles(input.investigationId);
+      }),
+
+    // Get a single profile by ID
+    getProfile: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .query(async ({ input }) => {
+        const profile = await getSocialMediaProfileById(input.id);
+        if (!profile) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
+        }
+        return profile;
+      }),
+
+    // Add a social media profile to track
+    addProfile: protectedProcedure
+      .input(z.object({
+        investigationId: z.number(),
+        platform: z.enum(["twitter", "instagram", "tiktok", "facebook", "reddit", "youtube", "pinterest", "snapchat"]),
+        username: z.string().min(1),
+        profileUrl: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const id = await createSocialMediaProfile({
+          investigationId: input.investigationId,
+          platform: input.platform,
+          username: input.username,
+          profileUrl: input.profileUrl || null,
+          scrapingStatus: "pending",
+        });
+        return { id };
+      }),
+
+    // Trigger a scrape for a specific profile
+    scrapeProfile: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        const profile = await getSocialMediaProfileById(input.id);
+        if (!profile) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
+        }
+
+        // Import and run the scraper
+        const { scrapeSocialMediaProfile } = await import("./social-media-scrapers");
+        
+        try {
+          await updateSocialMediaProfile(input.id, { scrapingStatus: "pending" });
+          
+          const result = await scrapeSocialMediaProfile(profile.platform, profile.username);
+          
+          await updateSocialMediaProfile(input.id, {
+            profileData: result.profileData as any,
+            posts: result.posts as any,
+            stories: result.stories as any || null,
+            followers: result.profileData.followers || null,
+            following: result.profileData.following || null,
+            engagementMetrics: result.engagementMetrics as any || null,
+            lastScrapedAt: new Date(),
+            scrapingStatus: "success",
+            scrapingError: null,
+          });
+
+          return { success: true, data: result };
+        } catch (error: any) {
+          await updateSocialMediaProfile(input.id, {
+            scrapingStatus: "failed",
+            scrapingError: error.message || "Unknown scraping error",
+          });
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: `Scraping failed: ${error.message}`,
+          });
+        }
+      }),
+
+    // Scrape all profiles for an investigation
+    scrapeAll: protectedProcedure
+      .input(z.object({ investigationId: z.number() }))
+      .mutation(async ({ input }) => {
+        const profiles = await getSocialMediaProfiles(input.investigationId);
+        const { scrapeSocialMediaProfile } = await import("./social-media-scrapers");
+        
+        const results = [];
+        for (const profile of profiles) {
+          try {
+            const result = await scrapeSocialMediaProfile(profile.platform, profile.username);
+            await updateSocialMediaProfile(profile.id, {
+              profileData: result.profileData as any,
+              posts: result.posts as any,
+              stories: result.stories as any || null,
+              followers: result.profileData.followers || null,
+              following: result.profileData.following || null,
+              engagementMetrics: result.engagementMetrics as any || null,
+              lastScrapedAt: new Date(),
+              scrapingStatus: "success",
+              scrapingError: null,
+            });
+            results.push({ id: profile.id, success: true });
+          } catch (error: any) {
+            await updateSocialMediaProfile(profile.id, {
+              scrapingStatus: "failed",
+              scrapingError: error.message || "Unknown error",
+            });
+            results.push({ id: profile.id, success: false, error: error.message });
+          }
+        }
+        return { results };
+      }),
+
+    // Delete a social media profile
+    deleteProfile: protectedProcedure
+      .input(z.object({ id: z.number() }))
+      .mutation(async ({ input }) => {
+        await deleteSocialMediaProfile(input.id);
+        return { success: true };
+      }),
   }),
 });
 

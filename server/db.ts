@@ -4,8 +4,10 @@ import {
   InsertUser, users,
   investigations, findings,
   annotations, alerts, bulkJobs,
+  socialMediaProfiles,
   InsertInvestigation, InsertFinding,
-  InsertAnnotation, InsertAlert, InsertBulkJob
+  InsertAnnotation, InsertAlert, InsertBulkJob,
+  InsertSocialMediaProfile
 } from "../drizzle/schema";
 import { ENV } from './_core/env';
 
@@ -255,4 +257,38 @@ export async function getMonitoredInvestigations() {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   return db.select().from(investigations).where(eq(investigations.monitoringEnabled, true));
+}
+
+// --- Social Media Profile Helpers ---
+
+export async function createSocialMediaProfile(data: InsertSocialMediaProfile) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [result] = await db.insert(socialMediaProfiles).values(data).$returningId();
+  return result.id;
+}
+
+export async function getSocialMediaProfiles(investigationId: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  return db.select().from(socialMediaProfiles).where(eq(socialMediaProfiles.investigationId, investigationId));
+}
+
+export async function getSocialMediaProfileById(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  const [profile] = await db.select().from(socialMediaProfiles).where(eq(socialMediaProfiles.id, id)).limit(1);
+  return profile;
+}
+
+export async function updateSocialMediaProfile(id: number, data: Partial<Pick<typeof socialMediaProfiles.$inferSelect, 'profileData' | 'posts' | 'stories' | 'followers' | 'following' | 'engagementMetrics' | 'lastScrapedAt' | 'scrapingStatus' | 'scrapingError'>>) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.update(socialMediaProfiles).set(data).where(eq(socialMediaProfiles.id, id));
+}
+
+export async function deleteSocialMediaProfile(id: number) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  await db.delete(socialMediaProfiles).where(eq(socialMediaProfiles.id, id));
 }

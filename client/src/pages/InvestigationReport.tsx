@@ -31,6 +31,7 @@ import { SourceReliabilityBadge } from "@/components/SourceReliabilityBadge";
 import PsychologicalProfileComponent from "@/components/PsychologicalProfile";
 import { NetworkGraph } from "@/components/NetworkGraph";
 import { RealtimeMonitoring } from "@/components/RealtimeMonitoring";
+import { SocialMediaProfiles } from "@/components/SocialMediaProfiles";
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
   identity: { label: "Identity", icon: Shield, color: "text-blue-400", bgColor: "bg-blue-400/10" },
@@ -219,6 +220,7 @@ export default function InvestigationReport() {
           <TabsTrigger value="notes" className="text-xs"><Globe className="w-3.5 h-3.5 mr-1" />Case Notes</TabsTrigger>
           <TabsTrigger value="network" className="text-xs"><Network className="w-3.5 h-3.5 mr-1" />Network Graph</TabsTrigger>
           <TabsTrigger value="monitoring" className="text-xs"><Bell className="w-3.5 h-3.5 mr-1" />Monitoring</TabsTrigger>
+          <TabsTrigger value="social-media" className="text-xs"><Users className="w-3.5 h-3.5 mr-1" />Social Media</TabsTrigger>
         </TabsList>
 
         {/* Findings Tab */}
@@ -433,6 +435,10 @@ export default function InvestigationReport() {
             isMonitoring={!!investigation.monitoringEnabled}
             onToggleMonitoring={(enabled) => toggleMonitoringMutation.mutate({ id, enabled })}
           />
+        </TabsContent>
+
+        <TabsContent value="social-media">
+          <SocialMediaProfiles investigationId={id} />
         </TabsContent>
       </Tabs>
 

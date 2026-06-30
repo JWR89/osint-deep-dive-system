@@ -138,3 +138,22 @@
 - [x] Heartbeat job integration for periodic monitoring checks
 - [x] Alert statistics and filtering capabilities
 - [x] Live connection status indicator in monitoring UI
+
+
+## Phase 7: Social Media Scraper Integration
+
+- [x] Install Puppeteer and dependencies
+- [x] Create database schema for social_media_profiles table
+- [x] Build X (Twitter) scraper (posts, followers, bio, profile pic)
+- [x] Build Instagram scraper (bio, pics, posts, 3 recent stories)
+- [x] Build Facebook scraper (posts, friends, profile info, public activity)
+- [x] Build TikTok scraper (profile link and basic info)
+- [x] Build Pinterest scraper (pins, boards, profile info)
+- [x] Build Snapchat scraper (username, profile info)
+- [x] Create tRPC procedures for triggering and retrieving social media scrapes
+- [x] Build SocialMediaProfiles UI component with grid/detail views
+- [x] Integrate Social Media tab into investigation page
+- [x] Add error handling for failed scrapes
+- [x] Write tests for social media procedures
+- [ ] Build Reddit scraper using PRAW (posts, comments, karma, profile)
+- [ ] Build YouTube scraper using API (channels, videos, subscriber count)

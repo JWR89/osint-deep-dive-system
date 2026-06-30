@@ -150,6 +150,26 @@ export const bulkJobs = mysqlTable("bulkJobs", {
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 });
 
+// Social media profiles and scraping results
+export const socialMediaProfiles = mysqlTable("socialMediaProfiles", {
+  id: int("id").autoincrement().primaryKey(),
+  investigationId: int("investigationId").notNull(),
+  platform: mysqlEnum("platform", ["twitter", "instagram", "tiktok", "facebook", "reddit", "youtube", "pinterest", "snapchat"]).notNull(),
+  username: varchar("username", { length: 255 }).notNull(),
+  profileUrl: varchar("profileUrl", { length: 1024 }),
+  profileData: json("profileData"), // bio, followers, following, etc
+  posts: json("posts"), // array of posts/content
+  stories: json("stories"), // array of stories (Instagram, Snapchat)
+  followers: int("followers"),
+  following: int("following"),
+  engagementMetrics: json("engagementMetrics"), // likes, comments, shares, etc
+  lastScrapedAt: timestamp("lastScrapedAt"),
+  scrapingStatus: mysqlEnum("scrapingStatus", ["pending", "success", "failed"]).default("pending"),
+  scrapingError: text("scrapingError"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 export type Investigation = typeof investigations.$inferSelect;
@@ -168,3 +188,5 @@ export type MlInsight = typeof mlInsights.$inferSelect;
 export type InsertMlInsight = typeof mlInsights.$inferInsert;
 export type SubjectComparison = typeof subjectComparisons.$inferSelect;
 export type InsertSubjectComparison = typeof subjectComparisons.$inferInsert;
+export type SocialMediaProfile = typeof socialMediaProfiles.$inferSelect;
+export type InsertSocialMediaProfile = typeof socialMediaProfiles.$inferInsert;

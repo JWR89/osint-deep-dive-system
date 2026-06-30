@@ -114,3 +114,15 @@
 - [x] Display emotional timeline (sentiment over time)
 - [x] Show concern flags and red alerts
 - [x] Include psychological profile in PDF export
+
+
+## Phase 6: Network Visualization & Real-time Monitoring
+
+- [x] Network Graph Visualization (interactive D3.js/Cytoscape graph showing subject, connections, associates, relationship strength)
+- [x] Real-time Social Media Monitoring (alerts when subject posts, changes profile, gets mentioned)
+- [x] WebSocket integration for live alerts
+- [x] Monitoring dashboard showing active monitors and alert history
+- [x] Alert notification system (email, in-app, SMS)
+- [x] Network node filtering and search
+- [x] Relationship strength visualization (edge thickness/color based on connection strength)
+- [x] Export network graph as image or data

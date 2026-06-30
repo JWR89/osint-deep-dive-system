@@ -29,6 +29,8 @@ import { CommunicationPatterns } from "@/components/CommunicationPatterns";
 import { AliasResolution } from "@/components/AliasResolution";
 import { SourceReliabilityBadge } from "@/components/SourceReliabilityBadge";
 import PsychologicalProfileComponent from "@/components/PsychologicalProfile";
+import { NetworkGraph } from "@/components/NetworkGraph";
+import { RealtimeMonitoring } from "@/components/RealtimeMonitoring";
 
 const CATEGORY_CONFIG: Record<string, { label: string; icon: any; color: string; bgColor: string }> = {
   identity: { label: "Identity", icon: Shield, color: "text-blue-400", bgColor: "bg-blue-400/10" },
@@ -215,6 +217,8 @@ export default function InvestigationReport() {
           <TabsTrigger value="relationships" className="text-xs"><Network className="w-3.5 h-3.5 mr-1" />Network</TabsTrigger>
           <TabsTrigger value="geolocation" className="text-xs"><MapPin className="w-3.5 h-3.5 mr-1" />Geolocation</TabsTrigger>
           <TabsTrigger value="notes" className="text-xs"><Globe className="w-3.5 h-3.5 mr-1" />Case Notes</TabsTrigger>
+          <TabsTrigger value="network" className="text-xs"><Network className="w-3.5 h-3.5 mr-1" />Network Graph</TabsTrigger>
+          <TabsTrigger value="monitoring" className="text-xs"><Bell className="w-3.5 h-3.5 mr-1" />Monitoring</TabsTrigger>
         </TabsList>
 
         {/* Findings Tab */}
@@ -393,6 +397,42 @@ export default function InvestigationReport() {
             <CardHeader><CardTitle className="text-base flex items-center gap-2"><Globe className="w-4 h-4 text-primary" />Case Notes & Annotations</CardTitle></CardHeader>
             <CardContent><Annotations investigationId={id} /></CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Network Graph Tab */}
+        <TabsContent value="network">
+          <Card className="border-border/50">
+            <CardHeader><CardTitle className="text-base flex items-center gap-2"><Network className="w-4 h-4 text-primary" />Network Graph Visualization</CardTitle></CardHeader>
+            <CardContent>
+              <NetworkGraph
+                nodes={[
+                  { id: 'subject', label: investigation.subjectName, type: 'subject', color: '#3b82f6' },
+                  ...relationships.slice(0, 10).map((r, i) => ({
+                    id: `assoc-${i}`,
+                    label: (r as any).name || `Associate ${i + 1}`,
+                    type: ((r as any).type as any) || 'associate',
+                    color: '#10b981'
+                  }))
+                ]}
+                links={relationships.slice(0, 10).map((r, i) => ({
+                  source: 'subject',
+                  target: `assoc-${i}`,
+                  strength: (r as any).strength || 0.5,
+                  type: (r as any).type || 'connection'
+                }))}
+                title="Subject Network & Connections"
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Real-time Monitoring Tab */}
+        <TabsContent value="monitoring">
+          <RealtimeMonitoring
+            investigationId={String(id)}
+            isMonitoring={!!investigation.monitoringEnabled}
+            onToggleMonitoring={(enabled) => toggleMonitoringMutation.mutate({ id, enabled })}
+          />
         </TabsContent>
       </Tabs>
 

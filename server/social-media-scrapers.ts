@@ -328,6 +328,14 @@ export async function scrapeSocialMediaProfile(
         return await scraper.scrapePinterest(username);
       case 'snapchat':
         return await scraper.scrapeSnapchat(username);
+      case 'reddit': {
+        const { scrapeReddit } = await import('./reddit-scraper');
+        return await scrapeReddit(username);
+      }
+      case 'youtube': {
+        const { scrapeYouTube } = await import('./youtube-scraper');
+        return await scrapeYouTube(username);
+      }
       default:
         throw new Error(`Unsupported platform: ${platform}`);
     }

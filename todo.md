@@ -155,5 +155,5 @@
 - [x] Integrate Social Media tab into investigation page
 - [x] Add error handling for failed scrapes
 - [x] Write tests for social media procedures
-- [ ] Build Reddit scraper using PRAW (posts, comments, karma, profile)
-- [ ] Build YouTube scraper using API (channels, videos, subscriber count)
+- [x] Build Reddit scraper using Reddit OAuth API (posts, comments, karma, profile) - needs REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET
+- [x] Build YouTube scraper using API (channels, videos, subscriber count) - needs YOUTUBE_API_KEY

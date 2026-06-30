@@ -157,3 +157,13 @@
 - [x] Write tests for social media procedures
 - [x] Build Reddit scraper using Reddit OAuth API (posts, comments, karma, profile) - needs REDDIT_CLIENT_ID + REDDIT_CLIENT_SECRET
 - [x] Build YouTube scraper using API (channels, videos, subscriber count) - needs YOUTUBE_API_KEY
+
+## Phase 8: Replace Scrapers with URL-Paste Analysis
+
+- [x] Remove fake Puppeteer scrapers (social-media-scrapers.ts)
+- [x] Update tRPC procedures to support manual URL paste and data entry
+- [x] Update SocialMediaProfiles UI with URL paste input
+- [x] Add manual data entry fields (bio, followers, posts)
+- [x] Create Grok prompt template for profile analysis (integrated in UI)
+- [x] Keep Reddit and YouTube API scrapers (those work with real API keys)
+- [x] Test and verify (all 27 tests passing)

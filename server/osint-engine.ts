@@ -2,7 +2,8 @@ import { invokeLLM } from "./_core/llm";
 import { addFindings, updateInvestigation, getInvestigationFindings } from "./db";
 import type { InsertFinding } from "../drizzle/schema";
 import { webScraper } from "./web-scraper";
-import { analyzePsychologicalProfile, PsychologicalProfile } from "./psychological-profile";
+import { analyzePsychologicalProfile } from "./psychological-profile";
+import type { PsychologicalProfile } from "./psychological-profile";
 export type { PsychologicalProfile };
 
 export type SubjectDetails = {

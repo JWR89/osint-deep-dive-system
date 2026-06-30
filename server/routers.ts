@@ -457,26 +457,109 @@ export const appRouter = router({
         return profile;
       }),
 
-    // Add a social media profile to track
+    // Add a social media profile with URL and optional manual data
     addProfile: protectedProcedure
       .input(z.object({
         investigationId: z.number(),
         platform: z.enum(["twitter", "instagram", "tiktok", "facebook", "reddit", "youtube", "pinterest", "snapchat"]),
         username: z.string().min(1),
         profileUrl: z.string().optional(),
+        // Manual data entry fields
+        bio: z.string().optional(),
+        followers: z.number().optional(),
+        following: z.number().optional(),
+        posts: z.array(z.object({
+          content: z.string(),
+          timestamp: z.string().optional(),
+          likes: z.number().optional(),
+          comments: z.number().optional(),
+          shares: z.number().optional(),
+          url: z.string().optional(),
+        })).optional(),
       }))
       .mutation(async ({ input }) => {
+        const profileData: any = {};
+        if (input.bio) profileData.bio = input.bio;
+        if (input.followers != null) profileData.followers = input.followers;
+        if (input.following != null) profileData.following = input.following;
+
+        const posts = input.posts?.map((p, i) => ({
+          id: `post-${Date.now()}-${i}`,
+          ...p,
+          timestamp: p.timestamp || new Date().toISOString(),
+        })) || [];
+
+        const hasData = input.bio || input.followers != null || (input.posts && input.posts.length > 0);
+
         const id = await createSocialMediaProfile({
           investigationId: input.investigationId,
           platform: input.platform,
           username: input.username,
           profileUrl: input.profileUrl || null,
-          scrapingStatus: "pending",
+          profileData: Object.keys(profileData).length > 0 ? profileData : null,
+          posts: posts.length > 0 ? posts : null,
+          followers: input.followers || null,
+          following: input.following || null,
+          scrapingStatus: hasData ? "success" : "pending",
+          lastScrapedAt: hasData ? new Date() : null,
         });
         return { id };
       }),
 
-    // Trigger a scrape for a specific profile
+    // Update a profile with manually entered data (from user or Grok analysis)
+    updateProfileData: protectedProcedure
+      .input(z.object({
+        id: z.number(),
+        bio: z.string().optional(),
+        followers: z.number().optional(),
+        following: z.number().optional(),
+        verified: z.boolean().optional(),
+        posts: z.array(z.object({
+          content: z.string(),
+          timestamp: z.string().optional(),
+          likes: z.number().optional(),
+          comments: z.number().optional(),
+          shares: z.number().optional(),
+          url: z.string().optional(),
+        })).optional(),
+        notes: z.string().optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const profile = await getSocialMediaProfileById(input.id);
+        if (!profile) {
+          throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
+        }
+
+        const existingData = (profile.profileData as any) || {};
+        const profileData: any = { ...existingData };
+        if (input.bio !== undefined) profileData.bio = input.bio;
+        if (input.followers !== undefined) profileData.followers = input.followers;
+        if (input.following !== undefined) profileData.following = input.following;
+        if (input.verified !== undefined) profileData.verified = input.verified;
+        if (input.notes !== undefined) profileData.notes = input.notes;
+
+        const posts = input.posts?.map((p, i) => ({
+          id: `post-${Date.now()}-${i}`,
+          ...p,
+          timestamp: p.timestamp || new Date().toISOString(),
+        }));
+
+        const updateData: any = {
+          profileData,
+          lastScrapedAt: new Date(),
+          scrapingStatus: "success",
+          scrapingError: null,
+        };
+
+        if (input.followers !== undefined) updateData.followers = input.followers;
+        if (input.following !== undefined) updateData.following = input.following;
+        if (posts) updateData.posts = posts;
+
+        await updateSocialMediaProfile(input.id, updateData);
+        return { success: true };
+      }),
+
+    // Auto-scrape using API (Reddit and YouTube only)
     scrapeProfile: protectedProcedure
       .input(z.object({ id: z.number() }))
       .mutation(async ({ input }) => {
@@ -485,14 +568,19 @@ export const appRouter = router({
           throw new TRPCError({ code: "NOT_FOUND", message: "Profile not found" });
         }
 
-        // Import and run the scraper
-        const { scrapeSocialMediaProfile } = await import("./social-media-scrapers");
-        
+        const { supportsAutoScrape, scrapeSocialMediaProfile } = await import("./social-media-scrapers");
+
+        if (!supportsAutoScrape(profile.platform)) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: `${profile.platform} does not support auto-scraping. Please enter data manually or use the Grok prompt to analyze the profile.`,
+          });
+        }
+
         try {
           await updateSocialMediaProfile(input.id, { scrapingStatus: "pending" });
-          
           const result = await scrapeSocialMediaProfile(profile.platform, profile.username);
-          
+
           await updateSocialMediaProfile(input.id, {
             profileData: result.profileData as any,
             posts: result.posts as any,
@@ -518,15 +606,19 @@ export const appRouter = router({
         }
       }),
 
-    // Scrape all profiles for an investigation
+    // Scrape all API-supported profiles for an investigation
     scrapeAll: protectedProcedure
       .input(z.object({ investigationId: z.number() }))
       .mutation(async ({ input }) => {
         const profiles = await getSocialMediaProfiles(input.investigationId);
-        const { scrapeSocialMediaProfile } = await import("./social-media-scrapers");
-        
+        const { supportsAutoScrape, scrapeSocialMediaProfile } = await import("./social-media-scrapers");
+
         const results = [];
         for (const profile of profiles) {
+          if (!supportsAutoScrape(profile.platform)) {
+            results.push({ id: profile.id, success: false, error: `${profile.platform} requires manual data entry` });
+            continue;
+          }
           try {
             const result = await scrapeSocialMediaProfile(profile.platform, profile.username);
             await updateSocialMediaProfile(profile.id, {

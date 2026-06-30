@@ -55,24 +55,24 @@
 ## Phase 2: Real API Integrations & Advanced ML Analysis
 
 ### Intelligence Depth - Real API Integrations
-- [ ] Pipl API integration (people search, email lookup, phone lookup)
-- [ ] Spokeo API integration (background checks, address history, relatives)
-- [ ] WHOIS API integration (domain registration, ownership, history)
-- [ ] News API integration (news mentions, sentiment analysis, controversies)
-- [ ] HaveIBeenPwned API integration (email breach history with breach details)
-- [ ] Phone number lookup API (carrier info, line type, location)
-- [ ] Social media scraping (Twitter/X, Instagram, TikTok posts, followers, engagement)
-- [ ] Real data aggregation layer (deduplicate, cross-reference, enrich findings)
+- [x] Pipl API integration (people search, email lookup, phone lookup)
+- [x] Spokeo API integration (background checks, address history, relatives)
+- [x] WHOIS API integration (domain registration, ownership, history)
+- [x] News API integration (news mentions, sentiment analysis, controversies)
+- [x] HaveIBeenPwned API integration (email breach history with breach details)
+- [x] Phone number lookup API (carrier info, line type, location)
+- [x] Social media scraping (Twitter/X, Instagram, TikTok posts, followers, engagement)
+- [x] Real data aggregation layer (deduplicate, cross-reference, enrich findings)
 
 ### Advanced Analysis - ML & Pattern Detection
-- [ ] ML pattern detection engine (find connections across multiple investigations)
-- [ ] Automated risk scoring based on historical data and patterns
-- [ ] Predictive indicators (likelihood of future activity, behavioral prediction)
-- [ ] Cross-subject comparison tool (find connections between two subjects)
-- [ ] Anomaly detection (unusual activity patterns, red flags)
-- [ ] Relationship strength scoring (how connected are two subjects)
-- [ ] Temporal analysis (when did connections form, activity trends over time)
-- [ ] New "Insights" tab in report showing ML-derived patterns and predictions
+- [x] ML pattern detection engine (find connections across multiple investigations)
+- [x] Automated risk scoring based on historical data and patterns
+- [x] Predictive indicators (likelihood of future activity, behavioral prediction)
+- [x] Cross-subject comparison tool (find connections between two subjects)
+- [x] Anomaly detection (unusual activity patterns, red flags)
+- [x] Relationship strength scoring (how connected are two subjects)
+- [x] Temporal analysis (when did connections form, activity trends over time)
+- [x] New "Insights" tab in report showing ML-derived patterns and predictions
 
 
 ## Phase 3: Advanced Psychological & Behavioral Analysis (NEW)

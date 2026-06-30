@@ -3,6 +3,10 @@ import * as d3 from 'd3';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Download, FileJson, Image } from 'lucide-react';
+import { exportGraphAsPNG, exportGraphAsSVG, exportGraphAsJSON, exportGraphAsCSV } from '@/lib/graphExport';
+import { toast } from 'sonner';
 
 interface Node {
   id: string;
@@ -45,7 +49,56 @@ export function NetworkGraph({ nodes, links, title = 'Network Analysis' }: Netwo
   const svgRef = useRef<SVGSVGElement>(null);
   const [selectedNode, setSelectedNode] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [isExporting, setIsExporting] = useState(false);
   const simulationRef = useRef<d3.Simulation<D3Node, D3Link> | null>(null);
+
+  const handleExportPNG = async () => {
+    setIsExporting(true);
+    try {
+      await exportGraphAsPNG(svgRef.current, `${title.replace(/\s+/g, '-')}.png`);
+      toast.success('Graph exported as PNG');
+    } catch (error) {
+      toast.error('Failed to export graph as PNG');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportSVG = () => {
+    setIsExporting(true);
+    try {
+      exportGraphAsSVG(svgRef.current, `${title.replace(/\s+/g, '-')}.svg`);
+      toast.success('Graph exported as SVG');
+    } catch (error) {
+      toast.error('Failed to export graph as SVG');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportJSON = () => {
+    setIsExporting(true);
+    try {
+      exportGraphAsJSON(nodes, links, title, `${title.replace(/\s+/g, '-')}.json`);
+      toast.success('Graph exported as JSON');
+    } catch (error) {
+      toast.error('Failed to export graph as JSON');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const handleExportCSV = () => {
+    setIsExporting(true);
+    try {
+      exportGraphAsCSV(nodes, links, `${title.replace(/\s+/g, '-')}-edges.csv`);
+      toast.success('Graph exported as CSV');
+    } catch (error) {
+      toast.error('Failed to export graph as CSV');
+    } finally {
+      setIsExporting(false);
+    }
+  };
 
   const filteredNodes = useMemo(() => {
     if (!searchTerm) return nodes;
@@ -294,31 +347,79 @@ export function NetworkGraph({ nodes, links, title = 'Network Analysis' }: Netwo
             </div>
           )}
 
-          <div className="text-xs text-slate-400 bg-slate-800 p-3 rounded-lg">
-            <p className="font-semibold mb-1">Legend:</p>
-            <div className="space-y-1">
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-blue-500" />
-                <span>Subject (Primary target)</span>
+          <div className="space-y-3">
+            <div className="text-xs text-slate-400 bg-slate-800 p-3 rounded-lg">
+              <p className="font-semibold mb-1">Legend:</p>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-blue-500" />
+                  <span>Subject (Primary target)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-green-500" />
+                  <span>Associate (Connected person)</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-amber-500" />
+                  <span>Location</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-purple-500" />
+                  <span>Account/Online Identity</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="w-3 h-3 rounded-full bg-pink-500" />
+                  <span>Employer/Organization</span>
+                </div>
               </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-green-500" />
-                <span>Associate (Connected person)</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-amber-500" />
-                <span>Location</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-purple-500" />
-                <span>Account/Online Identity</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-3 h-3 rounded-full bg-pink-500" />
-                <span>Employer/Organization</span>
+              <p className="text-slate-500 mt-2">Drag nodes to reposition • Scroll to zoom • Click nodes to select</p>
+            </div>
+
+            <div className="bg-slate-800 p-4 rounded-lg space-y-2">
+              <p className="text-sm font-semibold text-white">Export Graph</p>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  onClick={handleExportPNG}
+                  disabled={isExporting}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  <Image className="w-3 h-3 mr-1" />
+                  PNG
+                </Button>
+                <Button
+                  onClick={handleExportSVG}
+                  disabled={isExporting}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  <Image className="w-3 h-3 mr-1" />
+                  SVG
+                </Button>
+                <Button
+                  onClick={handleExportJSON}
+                  disabled={isExporting}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  <FileJson className="w-3 h-3 mr-1" />
+                  JSON
+                </Button>
+                <Button
+                  onClick={handleExportCSV}
+                  disabled={isExporting}
+                  size="sm"
+                  variant="outline"
+                  className="text-xs"
+                >
+                  <Download className="w-3 h-3 mr-1" />
+                  CSV
+                </Button>
               </div>
             </div>
-            <p className="text-slate-500 mt-2">Drag nodes to reposition • Scroll to zoom • Click nodes to select</p>
           </div>
         </div>
       </Card>

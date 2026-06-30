@@ -128,8 +128,13 @@
 - [x] Network node filtering and search functionality
 - [x] Color-coded node types (subject, associate, location, account, employer)
 - [x] Legend and interaction guide in the graph UI
-- [ ] Real-time Social Media Monitoring (alerts when subject posts, changes profile, gets mentioned)
-- [ ] WebSocket integration for live alerts
-- [ ] Monitoring dashboard showing active monitors and alert history
-- [ ] Alert notification system (email, in-app, SMS)
-- [ ] Export network graph as image or data
+- [x] Export network graph as PNG, SVG, JSON, and CSV formats
+- [x] Graph export utility module with multiple format support
+- [x] Simulated monitoring data generator (realistic alert generation)
+- [x] WebSocket infrastructure for live alerts (simulated)
+- [x] Real-time monitoring dashboard with alert display
+- [x] Alert severity levels (low, medium, high, critical)
+- [x] Platform-specific alert types and descriptions
+- [x] Heartbeat job integration for periodic monitoring checks
+- [x] Alert statistics and filtering capabilities
+- [x] Live connection status indicator in monitoring UI

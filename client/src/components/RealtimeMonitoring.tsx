@@ -2,17 +2,19 @@ import React, { useState, useEffect } from 'react';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Bell, AlertCircle, CheckCircle2, Clock } from 'lucide-react';
+import { Bell, AlertCircle, CheckCircle2, Clock, Zap } from 'lucide-react';
+import { alertClient } from '@/lib/websocket-alerts';
 
 interface Alert {
   id: string;
   timestamp: Date;
   source: 'twitter' | 'instagram' | 'facebook' | 'reddit' | 'tiktok' | 'linkedin';
-  type: 'new_post' | 'profile_change' | 'mention' | 'comment' | 'follow';
+  type: 'new_post' | 'profile_change' | 'mention' | 'comment' | 'follow' | string;
   title: string;
   description: string;
   url?: string;
   read: boolean;
+  severity?: 'low' | 'medium' | 'high' | 'critical';
 }
 
 interface RealtimeMonitoringProps {
@@ -26,37 +28,50 @@ export function RealtimeMonitoring({
   isMonitoring,
   onToggleMonitoring,
 }: RealtimeMonitoringProps) {
-  const [alerts, setAlerts] = useState<Alert[]>([
-    {
-      id: '1',
-      timestamp: new Date(Date.now() - 2 * 60000),
-      source: 'twitter',
-      type: 'new_post',
-      title: 'New Tweet Posted',
-      description: 'Subject posted: "Just finished an amazing project at work"',
-      url: 'https://twitter.com/example',
-      read: false,
-    },
-    {
-      id: '2',
-      timestamp: new Date(Date.now() - 15 * 60000),
-      source: 'instagram',
-      type: 'profile_change',
-      title: 'Profile Bio Updated',
-      description: 'Bio changed from "Designer" to "Designer | Photographer"',
-      read: false,
-    },
-    {
-      id: '3',
-      timestamp: new Date(Date.now() - 1 * 3600000),
-      source: 'reddit',
-      type: 'mention',
-      title: 'Subject Mentioned',
-      description: 'Subject mentioned in r/technology thread about AI',
-      url: 'https://reddit.com/r/technology',
-      read: true,
-    },
-  ]);
+  const [alerts, setAlerts] = useState<Alert[]>([]);
+  const [isConnected, setIsConnected] = useState(false);
+  const [subjectName, setSubjectName] = useState('Subject');
+
+  // Connect to alert system when monitoring starts
+  useEffect(() => {
+    if (!isMonitoring) {
+      alertClient.disconnect();
+      setIsConnected(false);
+      return;
+    }
+
+    // Extract subject name from investigationId if available
+    const name = localStorage.getItem(`investigation-${investigationId}-subject`) || 'Subject';
+    setSubjectName(name);
+
+    // Connect to alerts
+    alertClient.connect(parseInt(investigationId), name).then(() => {
+      setIsConnected(true);
+    });
+
+    // Subscribe to new alerts
+    const unsubscribe = alertClient.onAlert((message) => {
+      if (message.type === 'new_alert') {
+        const newAlert: Alert = {
+          id: message.data.id,
+          timestamp: new Date(message.data.timestamp),
+          source: message.data.platform,
+          type: message.data.type,
+          title: message.data.title,
+          description: message.data.description,
+          url: message.data.url,
+          read: false,
+          severity: message.data.severity,
+        };
+        setAlerts(prev => [newAlert, ...prev].slice(0, 50));
+      }
+    });
+
+    return () => {
+      unsubscribe();
+      alertClient.disconnect();
+    };
+  }, [isMonitoring, investigationId]);
 
   const sourceColors: Record<string, string> = {
     twitter: 'bg-blue-500',
@@ -67,12 +82,23 @@ export function RealtimeMonitoring({
     linkedin: 'bg-blue-700',
   };
 
+  const severityColors: Record<string, string> = {
+    low: 'border-blue-500/50 bg-blue-900/20',
+    medium: 'border-yellow-500/50 bg-yellow-900/20',
+    high: 'border-orange-500/50 bg-orange-900/20',
+    critical: 'border-red-500/50 bg-red-900/20',
+  };
+
   const typeIcons: Record<string, React.ReactNode> = {
     new_post: '📝',
     profile_change: '✏️',
+    profile_update: '✏️',
     mention: '🔔',
     comment: '💬',
     follow: '👥',
+    follower_change: '👥',
+    engagement_spike: '📈',
+    location_checkin: '📍',
   };
 
   const unreadCount = alerts.filter(a => !a.read).length;
@@ -120,11 +146,29 @@ export function RealtimeMonitoring({
         </div>
 
         {isMonitoring && (
-          <div className="bg-green-900/20 border border-green-700 rounded-lg p-3 mb-4 flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-green-500" />
-            <span className="text-sm text-green-300">
-              Monitoring active. Checking for updates every 5 minutes.
-            </span>
+          <div
+            className={`border rounded-lg p-3 mb-4 flex items-center gap-2 ${
+              isConnected
+                ? 'bg-green-900/20 border-green-700'
+                : 'bg-yellow-900/20 border-yellow-700'
+            }`}
+          >
+            {isConnected ? (
+              <>
+                <CheckCircle2 className="w-4 h-4 text-green-500" />
+                <span className="text-sm text-green-300">
+                  <Zap className="w-3 h-3 inline mr-1" />
+                  Live monitoring active. Real-time alerts enabled.
+                </span>
+              </>
+            ) : (
+              <>
+                <Clock className="w-4 h-4 text-yellow-500 animate-spin" />
+                <span className="text-sm text-yellow-300">
+                  Connecting to alert system...
+                </span>
+              </>
+            )}
           </div>
         )}
       </Card>
@@ -164,18 +208,36 @@ export function RealtimeMonitoring({
                 className={`p-3 rounded-lg border cursor-pointer transition ${
                   alert.read
                     ? 'bg-slate-700/50 border-slate-600'
+                    : alert.severity
+                    ? severityColors[alert.severity] || 'bg-slate-700 border-slate-500 ring-1 ring-blue-500/50'
                     : 'bg-slate-700 border-slate-500 ring-1 ring-blue-500/50'
                 }`}
               >
                 <div className="flex items-start gap-3">
                   <div className={`w-2 h-2 rounded-full mt-1.5 flex-shrink-0 ${sourceColors[alert.source]}`} />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-sm">{typeIcons[alert.type]}</span>
+                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                      <span className="text-sm">{typeIcons[alert.type] || '🔔'}</span>
                       <span className="font-medium text-white text-sm">{alert.title}</span>
                       <Badge variant="outline" className="text-xs capitalize">
                         {alert.source}
                       </Badge>
+                      {alert.severity && (
+                        <Badge
+                          variant="outline"
+                          className={`text-xs capitalize ${
+                            alert.severity === 'critical'
+                              ? 'border-red-500 text-red-400'
+                              : alert.severity === 'high'
+                              ? 'border-orange-500 text-orange-400'
+                              : alert.severity === 'medium'
+                              ? 'border-yellow-500 text-yellow-400'
+                              : 'border-blue-500 text-blue-400'
+                          }`}
+                        >
+                          {alert.severity}
+                        </Badge>
+                      )}
                     </div>
                     <p className="text-sm text-slate-300 truncate">{alert.description}</p>
                     <p className="text-xs text-slate-500 mt-1">{formatTime(alert.timestamp)}</p>

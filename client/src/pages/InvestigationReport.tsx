@@ -349,7 +349,7 @@ export default function InvestigationReport() {
         <TabsContent value="psychology">
           <Card className="border-border/50">
             <CardHeader><CardTitle className="text-base flex items-center gap-2"><MessageSquare className="w-4 h-4 text-primary" />Psychological Profile Analysis</CardTitle></CardHeader>
-            <CardContent>{investigation.psychologicalProfile ? <PsychologicalProfileComponent profile={investigation.psychologicalProfile} /> : <p className="text-sm text-muted-foreground italic">No psychological profile data available. Run investigation with social media scraping enabled.</p>}</CardContent>
+            <CardContent>{investigation.psychologicalProfile && typeof investigation.psychologicalProfile === 'object' ? <PsychologicalProfileComponent profile={investigation.psychologicalProfile as any} /> : <p className="text-sm text-muted-foreground italic">No psychological profile data available. Run investigation with social media scraping enabled.</p>}</CardContent>
           </Card>
         </TabsContent>
 

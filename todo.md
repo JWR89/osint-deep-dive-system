@@ -77,40 +77,40 @@
 
 ## Phase 3: Advanced Psychological & Behavioral Analysis (NEW)
 
-- [ ] Psychological Profile Generator (analyzes social media posts for personality traits, mental state, behavioral patterns)
-- [ ] Sentiment Analysis of posts (positive, negative, neutral, aggressive, depressive indicators)
-- [ ] Personality Trait Detection (Big Five: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
-- [ ] Behavioral Pattern Analysis (posting frequency, response times, interaction style, aggression levels)
-- [ ] Psychological Risk Indicators (depression, anxiety, suicidal ideation, violence indicators)
-- [ ] Linguistic Analysis (writing style, vocabulary, grammar patterns, unique phrases)
-- [ ] Emotional State Timeline (track emotional changes over time from posts)
-- [ ] Psychological Profile Report Tab (new dashboard tab with findings)
+- [x] Psychological Profile Generator (analyzes social media posts for personality traits, mental state, behavioral patterns)
+- [x] Sentiment Analysis of posts (positive, negative, neutral, aggressive, depressive indicators)
+- [x] Personality Trait Detection (Big Five: Openness, Conscientiousness, Extraversion, Agreeableness, Neuroticism)
+- [x] Behavioral Pattern Analysis (posting frequency, response times, interaction style, aggression levels)
+- [x] Psychological Risk Indicators (depression, anxiety, suicidal ideation, violence indicators)
+- [x] Linguistic Analysis (writing style, vocabulary, grammar patterns, unique phrases)
+- [x] Emotional State Timeline (track emotional changes over time from posts)
+- [x] Psychological Profile Report Tab (new dashboard tab with findings)
 
 
 ## Phase 4: Social Media Scraping & Real Data Integration
 
-- [ ] Puppeteer-based web scraper module (X, Reddit, dating sites, public profiles)
-- [ ] X/Twitter scraper (search username, extract posts, followers, engagement)
-- [ ] Reddit scraper (search username, extract posts, comments, subreddits)
-- [ ] Dating site scrapers (Match, Bumble, Hinge, OkCupid, Tinder - public profiles)
-- [ ] Generic public profile scraper (LinkedIn, GitHub, personal websites)
-- [ ] Facebook Graph API integration (posts, profile info, friends list)
-- [ ] Instagram Graph API integration (posts, followers, engagement, bio)
-- [ ] Post storage and deduplication in database
-- [ ] Scraping progress tracking and real-time UI updates
-- [ ] Rate limiting and anti-detection (rotate user agents, delays)
-- [ ] Error handling and retry logic for failed scrapes
+- [x] Puppeteer-based web scraper module (X, Reddit, dating sites, public profiles)
+- [x] X/Twitter scraper (search username, extract posts, followers, engagement)
+- [x] Reddit scraper (search username, extract posts, comments, subreddits)
+- [x] Dating site scrapers (Match, Bumble, Hinge, OkCupid, Tinder - public profiles)
+- [x] Generic public profile scraper (LinkedIn, GitHub, personal websites)
+- [x] Facebook Graph API integration (posts, profile info, friends list)
+- [x] Instagram Graph API integration (posts, followers, engagement, bio)
+- [x] Post storage and deduplication in database
+- [x] Scraping progress tracking and real-time UI updates
+- [x] Rate limiting and anti-detection (rotate user agents, delays)
+- [x] Error handling and retry logic for failed scrapes
 
 ## Phase 5: Psychological Profiling Integration
 
-- [ ] Integrate psychological profile module into investigation engine
-- [ ] Run psychological analysis on all scraped social media posts
-- [ ] Extract personality traits from complete post history
-- [ ] Identify communication preferences and social tendencies
-- [ ] Detect stress triggers and emotional vulnerabilities
-- [ ] Create "Psychological Profile" dashboard tab
-- [ ] Display Big Five traits with visual breakdown
-- [ ] Show risk indicators (depression, violence, paranoia, etc.)
-- [ ] Display emotional timeline (sentiment over time)
-- [ ] Show concern flags and red alerts
-- [ ] Include psychological profile in PDF export
+- [x] Integrate psychological profile module into investigation engine
+- [x] Run psychological analysis on all scraped social media posts
+- [x] Extract personality traits from complete post history
+- [x] Identify communication preferences and social tendencies
+- [x] Detect stress triggers and emotional vulnerabilities
+- [x] Create "Psychological Profile" dashboard tab
+- [x] Display Big Five traits with visual breakdown
+- [x] Show risk indicators (depression, violence, paranoia, etc.)
+- [x] Display emotional timeline (sentiment over time)
+- [x] Show concern flags and red alerts
+- [x] Include psychological profile in PDF export

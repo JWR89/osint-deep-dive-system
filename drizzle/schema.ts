@@ -39,6 +39,7 @@ export const investigations = mysqlTable("investigations", {
   domainInfrastructure: json("domainInfrastructure"),
   courtDocuments: json("courtDocuments"),
   professionalVerification: json("professionalVerification"),
+  psychologicalProfile: json("psychologicalProfile"),
   executiveSummary: text("executiveSummary"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

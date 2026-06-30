@@ -118,11 +118,18 @@
 
 ## Phase 6: Network Visualization & Real-time Monitoring
 
-- [x] Network Graph Visualization (interactive D3.js/Cytoscape graph showing subject, connections, associates, relationship strength)
-- [x] Real-time Social Media Monitoring (alerts when subject posts, changes profile, gets mentioned)
-- [x] WebSocket integration for live alerts
-- [x] Monitoring dashboard showing active monitors and alert history
-- [x] Alert notification system (email, in-app, SMS)
-- [x] Network node filtering and search
+- [x] D3.js force-directed graph implementation with automatic node clustering
+- [x] Force simulation with link strength-based distance calculation
+- [x] Interactive node dragging with physics-based movement
+- [x] Zoom and pan capabilities with D3 zoom behavior
+- [x] Node hover effects with smooth transitions
+- [x] Node selection with visual highlighting and connected node display
 - [x] Relationship strength visualization (edge thickness/color based on connection strength)
-- [x] Export network graph as image or data
+- [x] Network node filtering and search functionality
+- [x] Color-coded node types (subject, associate, location, account, employer)
+- [x] Legend and interaction guide in the graph UI
+- [ ] Real-time Social Media Monitoring (alerts when subject posts, changes profile, gets mentioned)
+- [ ] WebSocket integration for live alerts
+- [ ] Monitoring dashboard showing active monitors and alert history
+- [ ] Alert notification system (email, in-app, SMS)
+- [ ] Export network graph as image or data
